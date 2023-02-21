@@ -1,83 +1,47 @@
+import { OpenAIModel, Source } from "@/types";
 import endent from "endent";
 import { createParser, ParsedEvent, ReconnectInterval } from "eventsource-parser";
-import { OpenAIModel, Source } from "./../types";
-
-export const cleanSourceText = (text: string) => {
-  return text
-    .trim()
-    .replace(/(\n){4,}/g, "\n\n\n")
-    .replace(/\n\n/g, " ")
-    .replace(/ {3,}/g, "  ")
-    .replace(/\t/g, "")
-    .replace(/\n+(\s*\n)*/g, "\n");
-};
-
-export const getSourceCount = (model: OpenAIModel) => {
-  switch (model) {
-    case OpenAIModel.DAVINCI_TEXT:
-      return 3;
-    case OpenAIModel.CURIE_TEXT:
-      return 4;
-    case OpenAIModel.DAVINCI_CODE:
-      return 5;
-    default:
-      return 3;
-  }
-};
-
-export const shortenSourceText = (text: string, model: OpenAIModel) => {
-  switch (model) {
-    case OpenAIModel.DAVINCI_TEXT:
-      return text.slice(0, 1500);
-    case OpenAIModel.CURIE_TEXT:
-      return text.slice(0, 1500);
-    case OpenAIModel.DAVINCI_CODE:
-      return text.slice(0, 3000);
-    default:
-      return text.slice(0, 1500);
-  }
-};
 
 const createTextDavinciPrompt = (query: string, sources: Source[]) => {
   return endent`INSTRUCTIONS
-  Provide a 2-3 sentence answer to the query based on the sources. Be original, concise, accurate, and helpful. Cite sources as [1] or [2] or [3] after each sentence to back up your answer (Ex: Correct: [1], Correct: [2][3], Incorrect: [1, 2]).
-  ###
-  SOURCES
-  
-  ${sources.map((source, idx) => `Source [${idx + 1}]:\n${source.text}`).join("\n\n")}
-  ###
-  QUERY
-  ${query}
-  ###
-  ANSWER`;
+    Provide a 2-3 sentence answer to the query based on the sources. Be original, concise, accurate, and helpful. Cite sources as [1] or [2] or [3] after each sentence to back up your answer (Ex: Correct: [1], Correct: [2][3], Incorrect: [1, 2]).
+    ###
+    SOURCES
+    
+    ${sources.map((source, idx) => `Source [${idx + 1}]:\n${source.text}`).join("\n\n")}
+    ###
+    QUERY
+    ${query}
+    ###
+    ANSWER`;
 };
 
 const createTextCuriePrompt = (query: string, sources: Source[]) => {
   return endent`INSTRUCTIONS
-  Provide a 2-3 sentence answer to the query based on the sources. Be original, concise, accurate, and helpful.
-  ###
-  SOURCES
-  
-  ${sources.map((source, idx) => `Source [${idx + 1}]:\n${source.text}`).join("\n\n")}
-  ###
-  QUERY
-  ${query}
-  ###
-  ANSWER`;
+    Provide a 2-3 sentence answer to the query based on the sources. Be original, concise, accurate, and helpful.
+    ###
+    SOURCES
+    
+    ${sources.map((source, idx) => `Source [${idx + 1}]:\n${source.text}`).join("\n\n")}
+    ###
+    QUERY
+    ${query}
+    ###
+    ANSWER`;
 };
 
 const createCodeDavinciPrompt = (query: string, sources: Source[]) => {
   return endent`INSTRUCTIONS
-  Provide a 2-3 sentence answer to the query based on the sources. Be original, concise, accurate, and helpful.
-  ###
-  SOURCES
-  
-  ${sources.map((source, idx) => `Source [${idx + 1}]:\n${source.text}`).join("\n\n")}
-  ###
-  QUERY
-  ${query}
-  ###
-  ANSWER`;
+    Provide a 2-3 sentence answer to the query based on the sources. Be original, concise, accurate, and helpful.
+    ###
+    SOURCES
+    
+    ${sources.map((source, idx) => `Source [${idx + 1}]:\n${source.text}`).join("\n\n")}
+    ###
+    QUERY
+    ${query}
+    ###
+    ANSWER`;
 };
 
 export const createPrompt = (query: string, sources: Source[], model: OpenAIModel) => {

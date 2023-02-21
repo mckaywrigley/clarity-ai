@@ -1,5 +1,5 @@
 import { OpenAIModel } from "@/types";
-import { OpenAIStream } from "@/utils";
+import { OpenAIStream } from "@/utils/answer";
 
 export const config = {
   runtime: "edge"

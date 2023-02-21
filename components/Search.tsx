@@ -1,5 +1,5 @@
 import { OpenAIModel, SearchQuery, Source } from "@/types";
-import { createPrompt } from "@/utils";
+import { createPrompt } from "@/utils/answer";
 import { IconArrowRight, IconBolt, IconSearch } from "@tabler/icons-react";
 import { FC, KeyboardEvent, useEffect, useRef, useState } from "react";
 
