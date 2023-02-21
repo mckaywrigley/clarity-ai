@@ -1,3 +1,3 @@
 # Clarity AI
 
-## A simple [perplexity.ai](perplexity.ai) clone.
+## A simple [perplexity.ai](https://www.perplexity.ai/) clone.
