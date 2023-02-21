@@ -41,9 +41,7 @@ export default function Home() {
         ) : (
           <Search
             onSearch={setSearchQuery}
-            onAnswerUpdate={(value) => {
-              setAnswer((prev) => prev + value);
-            }}
+            onAnswerUpdate={(value) => setAnswer((prev) => prev + value)}
             onDone={setDone}
           />
         )}
