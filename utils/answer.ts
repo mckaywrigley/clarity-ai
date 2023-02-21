@@ -4,44 +4,44 @@ import { createParser, ParsedEvent, ReconnectInterval } from "eventsource-parser
 
 const createTextDavinciPrompt = (query: string, sources: Source[]) => {
   return endent`INSTRUCTIONS
-    Provide a 2-3 sentence answer to the query based on the sources. Be original, concise, accurate, and helpful. Cite sources as [1] or [2] or [3] after each sentence to back up your answer (Ex: Correct: [1], Correct: [2][3], Incorrect: [1, 2]).
-    ###
-    SOURCES
-    
-    ${sources.map((source, idx) => `Source [${idx + 1}]:\n${source.text}`).join("\n\n")}
-    ###
-    QUERY
-    ${query}
-    ###
-    ANSWER`;
+  Provide a 2-3 sentence answer to the query based on the sources. Be original, concise, accurate, and helpful. Cite sources as [1] or [2] or [3] after each sentence to back up your answer (Ex: Correct: [1], Correct: [2][3], Incorrect: [1, 2]).
+  ###
+  SOURCES
+  
+  ${sources.map((source, idx) => `Source [${idx + 1}]:\n${source.text}`).join("\n\n")}
+  ###
+  QUERY
+  ${query}
+  ###
+  ANSWER`;
 };
 
 const createTextCuriePrompt = (query: string, sources: Source[]) => {
   return endent`INSTRUCTIONS
-    Provide a 2-3 sentence answer to the query based on the sources. Be original, concise, accurate, and helpful.
-    ###
-    SOURCES
-    
-    ${sources.map((source, idx) => `Source [${idx + 1}]:\n${source.text}`).join("\n\n")}
-    ###
-    QUERY
-    ${query}
-    ###
-    ANSWER`;
+  Provide a 2-3 sentence answer to the query based on the sources. Be original, concise, accurate, and helpful.
+  ###
+  SOURCES
+  
+  ${sources.map((source, idx) => `Source [${idx + 1}]:\n${source.text}`).join("\n\n")}
+  ###
+  QUERY
+  ${query}
+  ###
+  ANSWER`;
 };
 
 const createCodeDavinciPrompt = (query: string, sources: Source[]) => {
   return endent`INSTRUCTIONS
-    Provide a 2-3 sentence answer to the query based on the sources. Be original, concise, accurate, and helpful.
-    ###
-    SOURCES
-    
-    ${sources.map((source, idx) => `Source [${idx + 1}]:\n${source.text}`).join("\n\n")}
-    ###
-    QUERY
-    ${query}
-    ###
-    ANSWER`;
+  Provide a 2-3 sentence answer to the query based on the sources. Be original, concise, accurate, and helpful.
+  ###
+  SOURCES
+  
+  ${sources.map((source, idx) => `Source [${idx + 1}]:\n${source.text}`).join("\n\n")}
+  ###
+  QUERY
+  ${query}
+  ###
+  ANSWER`;
 };
 
 export const createPrompt = (query: string, sources: Source[], model: OpenAIModel) => {
