@@ -1,4 +1,4 @@
-import { Source } from "@/types";
+import { OpenAIModel, Source } from "@/types";
 import { Readability } from "@mozilla/readability";
 import * as cheerio from "cheerio";
 import { JSDOM } from "jsdom";
@@ -11,7 +11,10 @@ type Data = {
 
 const searchHandler = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
   try {
-    const { query, model } = req.body;
+    const { query, model } = req.body as {
+      query: string;
+      model: OpenAIModel;
+    };
 
     const sourceCount = getSourceCount(model);
 
