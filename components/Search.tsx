@@ -19,8 +19,13 @@ export const Search: FC<SearchProps> = ({ onSearch, onAnswerUpdate, onDone }) =>
   const [loading, setLoading] = useState<boolean>(false);
 
   const handleSearch = async () => {
+    if (!query) {
+      alert("Please enter a query");
+      return;
+    }
+
     setLoading(true);
-    const sources: Source[] = await fetchSources();
+    const sources = await fetchSources();
     await handleStream(sources);
   };
 
@@ -34,21 +39,17 @@ export const Search: FC<SearchProps> = ({ onSearch, onAnswerUpdate, onDone }) =>
     });
 
     if (!response.ok) {
+      setLoading(false);
       throw new Error(response.statusText);
     }
 
-    const { sources } = await response.json();
+    const { sources }: { sources: Source[] } = await response.json();
 
     return sources;
   };
 
   const handleStream = async (sources: Source[]) => {
     try {
-      if (!query) {
-        alert("Please enter a query");
-        return;
-      }
-
       let prompt = createPrompt(query, sources, model);
       const response = await fetch("/api/answer", {
         method: "POST",
@@ -225,6 +226,7 @@ export const Search: FC<SearchProps> = ({ onSearch, onAnswerUpdate, onDone }) =>
                 >
                   Save
                 </div>
+
                 <div
                   className="flex cursor-pointer items-center space-x-2 rounded-full border border-zinc-600 bg-red-500 px-3 py-1 text-sm text-white hover:bg-red-600"
                   onClick={handleClear}
