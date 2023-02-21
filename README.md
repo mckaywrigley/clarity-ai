@@ -8,7 +8,11 @@ If you have any questions, feel free to reach out to me on [Twitter](https://twi
 
 ## How It Works
 
-1. Enter query
+Given a query, Clarity fetches relevant, up-to-date information from the web and uses OpenAI's API to generate an answer.
+
+The app works as follows:
+
+1. Get query from user
 2. Scrape Google for relevant webpages
 3. Parse webpages for text
 4. Build prompt using query + webpage text
@@ -51,7 +55,7 @@ Here are some ideas for how to improve Clarity:
 
 ## Credits
 
-Shouout to [Perplexity AI](https://www.perplexity.ai/) for the inspiration. I highly recommend checking their product out.
+Shoutout to [Perplexity AI](https://www.perplexity.ai/) for the inspiration. I highly recommend checking their product out.
 
 This repo is meant to show people that you can build powerful apps like Perplexity even if you don't have a large, experienced team.
 
