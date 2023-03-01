@@ -1,6 +1,6 @@
-import { OpenAIModel, SearchQuery, Source } from "@/types";
-import { createPrompt } from "@/utils/answer";
+import { SearchQuery, Source } from "@/types";
 import { IconArrowRight, IconBolt, IconSearch } from "@tabler/icons-react";
+import endent from "endent";
 import { FC, KeyboardEvent, useEffect, useRef, useState } from "react";
 
 interface SearchProps {
@@ -13,7 +13,6 @@ export const Search: FC<SearchProps> = ({ onSearch, onAnswerUpdate, onDone }) =>
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [query, setQuery] = useState<string>("");
-  const [model, setModel] = useState<OpenAIModel>(OpenAIModel.DAVINCI_CODE);
   const [apiKey, setApiKey] = useState<string>("");
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -35,7 +34,7 @@ export const Search: FC<SearchProps> = ({ onSearch, onAnswerUpdate, onDone }) =>
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ query, model })
+      body: JSON.stringify({ query })
     });
 
     if (!response.ok) {
@@ -50,13 +49,17 @@ export const Search: FC<SearchProps> = ({ onSearch, onAnswerUpdate, onDone }) =>
 
   const handleStream = async (sources: Source[]) => {
     try {
-      let prompt = createPrompt(query, sources, model);
+      const prompt = endent`Provide a 2-3 sentence answer to the query based on the followin sources. Be original, concise, accurate, and helpful. Cite sources as [1] or [2] or [3] after each sentence (not just the very end) to back up your answer (Ex: Correct: [1], Correct: [2][3], Incorrect: [1, 2]).
+      
+      ${sources.map((source, idx) => `Source [${idx + 1}]:\n${source.text}`).join("\n\n")}
+      `;
+
       const response = await fetch("/api/answer", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ prompt, model, apiKey })
+        body: JSON.stringify({ prompt, apiKey })
       });
 
       if (!response.ok) {
@@ -102,13 +105,7 @@ export const Search: FC<SearchProps> = ({ onSearch, onAnswerUpdate, onDone }) =>
       return;
     }
 
-    if (!model) {
-      alert("Please select a model.");
-      return;
-    }
-
     localStorage.setItem("CLARITY_KEY", apiKey);
-    localStorage.setItem("CLARITY_MODEL", model);
 
     setShowSettings(false);
     inputRef.current?.focus();
@@ -116,27 +113,17 @@ export const Search: FC<SearchProps> = ({ onSearch, onAnswerUpdate, onDone }) =>
 
   const handleClear = () => {
     localStorage.removeItem("CLARITY_KEY");
-    localStorage.removeItem("CLARITY_MODEL");
 
     setApiKey("");
-    setModel(OpenAIModel.DAVINCI_CODE);
   };
 
   useEffect(() => {
     const CLARITY_KEY = localStorage.getItem("CLARITY_KEY");
-    const CLARITY_MODEL = localStorage.getItem("CLARITY_MODEL");
 
     if (CLARITY_KEY) {
       setApiKey(CLARITY_KEY);
     } else {
       setShowSettings(true);
-    }
-
-    if (CLARITY_MODEL) {
-      setModel(CLARITY_MODEL as OpenAIModel);
-    } else {
-      setShowSettings(true);
-      setModel(OpenAIModel.DAVINCI_CODE);
     }
 
     inputRef.current?.focus();
@@ -190,22 +177,6 @@ export const Search: FC<SearchProps> = ({ onSearch, onAnswerUpdate, onDone }) =>
 
           {showSettings && (
             <>
-              <select
-                value={model}
-                onChange={(e) => setModel(e.target.value as OpenAIModel)}
-                className="max-w-[400px] block w-full cursor-pointer rounded-md border border-gray-300 p-2 text-black shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm"
-              >
-                {Object.values(OpenAIModel).map((model) => (
-                  <option
-                    key={model}
-                    value={model}
-                    className="bg-gray-900 text-white"
-                  >
-                    {model}
-                  </option>
-                ))}
-              </select>
-
               <input
                 type="password"
                 className="max-w-[400px] block w-full rounded-md border border-gray-300 p-2 text-black shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm"

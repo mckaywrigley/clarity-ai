@@ -1,7 +1,5 @@
 export enum OpenAIModel {
-  DAVINCI_TEXT = "text-davinci-003",
-  CURIE_TEXT = "text-curie-001",
-  DAVINCI_CODE = "code-davinci-002"
+  DAVINCI_TURBO = "gpt-3.5-turbo"
 }
 
 export type Source = {

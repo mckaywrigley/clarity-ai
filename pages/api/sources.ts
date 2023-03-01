@@ -3,7 +3,7 @@ import { Readability } from "@mozilla/readability";
 import * as cheerio from "cheerio";
 import { JSDOM } from "jsdom";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { cleanSourceText, getSourceCount, shortenSourceText } from "../../utils/sources";
+import { cleanSourceText } from "../../utils/sources";
 
 type Data = {
   sources: Source[];
@@ -16,7 +16,7 @@ const searchHandler = async (req: NextApiRequest, res: NextApiResponse<Data>) =>
       model: OpenAIModel;
     };
 
-    const sourceCount = getSourceCount(model);
+    const sourceCount = 4;
 
     // GET LINKS
     const response = await fetch(`https://www.google.com/search?q=${query}`);
@@ -69,7 +69,7 @@ const searchHandler = async (req: NextApiRequest, res: NextApiResponse<Data>) =>
     const filteredSources = sources.filter((source) => source !== undefined);
 
     for (const source of filteredSources) {
-      source.text = shortenSourceText(source.text, model);
+      source.text = source.text.slice(0, 1500);
     }
 
     res.status(200).json({ sources: filteredSources });

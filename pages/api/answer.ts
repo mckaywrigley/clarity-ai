@@ -1,4 +1,3 @@
-import { OpenAIModel } from "@/types";
 import { OpenAIStream } from "@/utils/answer";
 
 export const config = {
@@ -7,13 +6,12 @@ export const config = {
 
 const handler = async (req: Request): Promise<Response> => {
   try {
-    const { prompt, model, apiKey } = (await req.json()) as {
+    const { prompt, apiKey } = (await req.json()) as {
       prompt: string;
-      model: OpenAIModel;
       apiKey: string;
     };
 
-    const stream = await OpenAIStream(prompt, model, apiKey);
+    const stream = await OpenAIStream(prompt, apiKey);
 
     return new Response(stream);
   } catch (error) {
