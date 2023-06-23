@@ -5,7 +5,7 @@ export const OpenAIStream = async (prompt: string, apiKey: string) => {
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
 
-  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/chat/completions`, {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`
@@ -19,7 +19,7 @@ export const OpenAIStream = async (prompt: string, apiKey: string) => {
       ],
       max_tokens: 120,
       temperature: 0.0,
-      stream: true
+      stream: false
     })
   });
 
@@ -27,7 +27,8 @@ export const OpenAIStream = async (prompt: string, apiKey: string) => {
     throw new Error("OpenAI API returned an error");
   }
 
-  const stream = new ReadableStream({
+  const json = await res.json();
+  /* const stream = new ReadableStream({
     async start(controller) {
       const onParse = (event: ParsedEvent | ReconnectInterval) => {
         if (event.type === "event") {
@@ -55,7 +56,7 @@ export const OpenAIStream = async (prompt: string, apiKey: string) => {
         parser.feed(decoder.decode(chunk));
       }
     }
-  });
-
-  return stream;
+  }); */
+  const [choice] = json.choices;
+  return choice.message.content;
 };
