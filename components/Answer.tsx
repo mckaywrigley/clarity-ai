@@ -1,5 +1,5 @@
 import { SearchQuery } from "@/types";
-import { IconReload } from "@tabler/icons-react";
+import { IconReload,IconBolt } from "@tabler/icons-react";
 import { FC } from "react";
 
 interface AnswerProps {
@@ -11,8 +11,13 @@ interface AnswerProps {
 
 export const Answer: FC<AnswerProps> = ({ searchQuery, answer, done, onReset }) => {
   return (
-    <div className="max-w-[800px] space-y-4 py-16 px-8 sm:px-24 sm:pt-16 pb-32">
-      <div className="overflow-auto text-2xl sm:text-4xl">{searchQuery.query}</div>
+    
+    <div className="max-w-[1200px] space-y-4 m-auto py-16 px-8 sm:px-24 sm:pt-16 pb-32">
+      <div className="flex items-center justify-center">
+            <IconBolt size={36} />
+            <div className="ml-1 text-center text-4xl">Clarity</div>
+          </div>
+      <div className="overflow-auto text-2xl sm:text-4xl py-2">{searchQuery.query}</div>
 
       <div className="border-b border-zinc-800 pb-4">
         <div className="text-md text-blue-500">Answer</div>
