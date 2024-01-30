@@ -36,6 +36,7 @@ export const Search: FC<SearchProps> = ({ onSearch, onAnswerUpdate, onDone }) =>
       },
       body: JSON.stringify({ query })
     });
+    // console.log(query)
 
     if (!response.ok) {
       setLoading(false);

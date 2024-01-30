@@ -17,7 +17,6 @@ const searchHandler = async (req: NextApiRequest, res: NextApiResponse<Data>) =>
     };
 
     const sourceCount = 4;
-
     // GET LINKS
     const response = await fetch(`https://www.google.com/search?q=${query}`);
     const html = await response.text();
@@ -39,15 +38,36 @@ const searchHandler = async (req: NextApiRequest, res: NextApiResponse<Data>) =>
     });
 
     const filteredLinks = links.filter((link, idx) => {
-      const domain = new URL(link).hostname;
-
-      const excludeList = ["google", "facebook", "twitter", "instagram", "youtube", "tiktok"];
-      if (excludeList.some((site) => domain.includes(site))) return false;
-
-      return links.findIndex((link) => new URL(link).hostname === domain) === idx;
+      const decodedLink = decodeURIComponent(link);
+      console.log(decodedLink);
+    
+      try {
+        const url = new URL(decodedLink);
+        const domain = url.hostname;
+    
+        const excludeList = ["google", "facebook", "twitter", "instagram", "youtube", "tiktok"];
+        if (excludeList.some((site) => domain.includes(site))) return false;
+    
+        return links.findIndex((otherLink) => {
+          try {
+            const otherUrl = new URL(otherLink);
+            return otherUrl.hostname === domain;
+          } catch (error) {
+            // Log invalid URLs in the links array
+            console.error(`Invalid URL in links array: ${otherLink}`);
+            return false;
+          }
+        }) === idx;
+      } catch (error) {
+        // Log invalid URLs in the current link
+        console.error(`Invalid URL: ${decodedLink}`);
+        return false;
+      }
     });
-
+    
     const finalLinks = filteredLinks.slice(0, sourceCount);
+    
+    
 
     // SCRAPE TEXT FROM LINKS
     const sources = (await Promise.all(
