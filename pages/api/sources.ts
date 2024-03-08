@@ -39,12 +39,12 @@ const searchHandler = async (req: NextApiRequest, res: NextApiResponse<Data>) =>
     });
 
     const filteredLinks = links.filter((link, idx) => {
-      const domain = new URL(link).hostname;
+      const domain = new URL(link, 'https://www.google.com').hostname;
 
       const excludeList = ["google", "facebook", "twitter", "instagram", "youtube", "tiktok"];
       if (excludeList.some((site) => domain.includes(site))) return false;
 
-      return links.findIndex((link) => new URL(link).hostname === domain) === idx;
+      return links.findIndex((link) => new URL(link, 'https://www.google.com').hostname === domain) === idx;
     });
 
     const finalLinks = filteredLinks.slice(0, sourceCount);
@@ -52,24 +52,31 @@ const searchHandler = async (req: NextApiRequest, res: NextApiResponse<Data>) =>
     // SCRAPE TEXT FROM LINKS
     const sources = (await Promise.all(
       finalLinks.map(async (link) => {
-        const response = await fetch(link);
-        const html = await response.text();
-        const dom = new JSDOM(html);
-        const doc = dom.window.document;
-        const parsed = new Readability(doc).parse();
+        try {
+          const response = await fetch(decodeURIComponent(link));
+          const html = await response.text();
+          const dom = new JSDOM(html);
+          const doc = dom.window.document;
+          const parsed = new Readability(doc).parse();
 
-        if (parsed) {
-          let sourceText = cleanSourceText(parsed.textContent);
+          if (parsed) {
+            let sourceText = cleanSourceText(parsed.textContent);
 
-          return { url: link, text: sourceText };
+            return { url: link, text: sourceText };
+          }
+        } catch (error) {
+          console.error("Error fetching or parsing content from URL:", error);
+          return null; // or some default value indicating failure
         }
       })
     )) as Source[];
 
-    const filteredSources = sources.filter((source) => source !== undefined);
+    const filteredSources = sources.filter((source) => source !== null);
 
     for (const source of filteredSources) {
-      source.text = source.text.slice(0, 1500);
+      if (source && source.text) {
+        source.text = source.text.slice(0, 1500);
+      }
     }
 
     res.status(200).json({ sources: filteredSources });
