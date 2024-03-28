@@ -8,7 +8,6 @@ import { cleanSourceText } from "../../utils/sources";
 type Data = {
   sources: Source[];
 };
-
 const searchHandler = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
   try {
     const { query, model } = req.body as {
@@ -31,20 +30,28 @@ const searchHandler = async (req: NextApiRequest, res: NextApiResponse<Data>) =>
 
       if (href && href.startsWith("/url?q=")) {
         const cleanedHref = href.replace("/url?q=", "").split("&")[0];
+        const decodedHref = decodeURIComponent(cleanedHref);
 
-        if (!links.includes(cleanedHref)) {
-          links.push(cleanedHref);
+        if (decodedHref.startsWith("http://") || decodedHref.startsWith("https://")) {
+          if (!links.includes(decodedHref)) {
+            links.push(decodedHref);
+          }
         }
       }
     });
 
     const filteredLinks = links.filter((link, idx) => {
-      const domain = new URL(link).hostname;
+      try {
+        const domain = new URL(link).hostname;
 
-      const excludeList = ["google", "facebook", "twitter", "instagram", "youtube", "tiktok"];
-      if (excludeList.some((site) => domain.includes(site))) return false;
+        const excludeList = ["google", "facebook", "twitter", "instagram", "youtube", "tiktok"];
+        if (excludeList.some((site) => domain.includes(site))) return false;
 
-      return links.findIndex((link) => new URL(link).hostname === domain) === idx;
+        return links.findIndex((link) => new URL(link).hostname === domain) === idx;
+      } catch (error) {
+        console.error(`Invalid URL: ${link}`);
+        return false;
+      }
     });
 
     const finalLinks = filteredLinks.slice(0, sourceCount);
